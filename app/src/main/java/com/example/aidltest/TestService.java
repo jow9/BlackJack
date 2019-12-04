@@ -48,7 +48,7 @@ public class TestService extends Service {
         public int CPUDrawCard() throws RemoteException {
             int sum = 0;
 
-            int border_value = new Random().nextInt(10) + 16;
+            int border_value = new Random().nextInt(10) + 16;//cpuが目指す目標値
             while(true){
                 if(card_list.size() < 1) DataReset();
 

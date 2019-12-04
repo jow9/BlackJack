@@ -24,6 +24,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     String my_allDrawCard = "";
     private IMyAidlInterface mService = null;
 
+    ArrayList<Integer> goal_list = new ArrayList<Integer>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +46,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
         bindService(intent, connect, BIND_AUTO_CREATE);
     }
 
+    /* ゴールデータの初期化 */
+    public void GoalDataReset(){
+        goal_list.clear();
+        for(int i = 0; i < 10; i++){
+            goal_list.add(i);
+        }
+    }
+
     /* プレイヤーの目標値を決定する */
     public void DefinGoalValue(){
-        goal_value = new Random().nextInt(10)+20;
+        if(goal_list.size() < 1)GoalDataReset();
+        int random = new Random().nextInt(goal_list.size());
+        goal_value = 20 + goal_list.get(random);
+        goal_list.remove(random);
+
+        //goal_value = new Random().nextInt(10)+20;
         TextView goal_txt = (TextView)findViewById(R.id.goal_id);
         goal_txt.setText(String.valueOf(2 + "?"));
     }
@@ -56,7 +71,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // TODO Auto-generated method stub
         if (v.getId() == R.id.draw_btn) {
             try {
-                /* サービス側でカードを引く処理を行う */
+                /* プレイヤーがカードを引く */
                 int card_value = mService.DrawCard();
                 my_allDrawCard += " " + card_value;
                 if(card_value > 10)card_value = 10;//11,12,13のカードを10に統一する
@@ -90,16 +105,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 goal_txt.setText(String.valueOf(goal_value));
                 TextView result_txt = (TextView)findViewById(R.id.result_id);
                 result_txt.setText(result);
-
             } catch (RemoteException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
 
+        /*初期化*/
         else if (v.getId() == R.id.restart_btn){
-            finish();
-            startActivity(getIntent());
+            //finish();
+            //startActivity(getIntent());
+            my_sum = 0;
+            my_allDrawCard = "";
+
+            TextView sum_txt = (TextView)findViewById(R.id.sum_id);
+            TextView drawlist_txt = (TextView)findViewById(R.id.drawlist_id);
+            sum_txt.setText("");
+            drawlist_txt.setText("");
+            TextView cpu_sum_txt = (TextView)findViewById(R.id.cpcard_id);
+            cpu_sum_txt.setText("");
+            TextView result_txt = (TextView)findViewById(R.id.result_id);
+            result_txt.setText("");
+
+            DefinGoalValue();//ゲームの目標値を決定する
+
         }
     }
 
